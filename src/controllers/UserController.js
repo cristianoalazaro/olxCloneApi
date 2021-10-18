@@ -1,4 +1,4 @@
-import validator from 'express-validator';
+import validator, { query } from 'express-validator';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
@@ -12,6 +12,12 @@ import Ad from '../models/Ad.js';
 const getStates = async (req, res) => {
     const states = await State.find();
     res.json({ states });
+}
+
+const getStateByName = async (req, res) => {
+    const stateName =  (req.query.state).toUpperCase() ;
+    const state = await State.findOne({name: stateName});
+    res.json(state.id);
 }
 
 const info = async (req, res) => {
@@ -64,7 +70,7 @@ const editAction = async (req, res) => {
 
     if (data.email) {
         const emailCheck = await User.findOne({ email: data.email });
-        if (emailCheck) {
+        if (emailCheck && emailCheck.email !== data.email) {
             return res.json({ error: 'E-mail já existe' });
         }
         updates.email = data.email;
@@ -91,4 +97,4 @@ const editAction = async (req, res) => {
     res.json({result: 'Usuário alterado com sucesso!'});
 }
 
-export default { getStates, info, editAction };
+export default { getStates, getStateByName, info, editAction };
